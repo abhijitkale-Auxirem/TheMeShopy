@@ -11,7 +11,7 @@ import { useProductStore } from '@/store/productStore';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useAuthStore } from '@/store/authStore';
-import { mockReviews } from '@/database/mockDb';
+import { useReviewStore } from '@/store/reviewStore';
 import { toast } from 'sonner';
 
 export default function ProductDetails() {
@@ -20,10 +20,11 @@ export default function ProductDetails() {
   const { products } = useProductStore();
   const { addItem, hasItem } = useCartStore();
   const { toggleItem, hasItem: isWished } = useWishlistStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
+  const { reviews: allReviews, addReview } = useReviewStore();
 
   const product = products.find(p => p.slug === slug);
-  const reviews = mockReviews.filter(r => r.productId === product?.id);
+  const reviews = allReviews.filter(r => r.productId === product?.id);
   const related = products.filter(p => p.categorySlug === product?.categorySlug && p.id !== product?.id).slice(0, 4);
 
   const [selectedLicense, setSelectedLicense] = useState<'regular' | 'extended'>('regular');
@@ -138,32 +139,50 @@ export default function ProductDetails() {
             )}
 
             {activeTab === 'reviews' && (
-              <div className="space-y-4">
-                {reviews.length === 0 ? (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">No reviews yet. Be the first!</p>
+              <div className="space-y-6">
+                {/* Write a Review Section */}
+                {isAuthenticated && user ? (
+                  <ReviewForm productId={product.id} user={user} onAddReview={addReview} />
                 ) : (
-                  reviews.map(r => (
-                    <div key={r.id} className="p-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <img src={r.userAvatar} alt={r.userName} className="w-9 h-9 rounded-full" />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-gray-900 dark:text-white text-sm">{r.userName}</p>
-                              {r.verified && <span className="flex items-center gap-1 text-xs text-emerald-600"><CheckCircle className="w-3 h-3" />Verified</span>}
-                            </div>
-                            <div className="flex gap-0.5 mt-0.5">
-                              {Array.from({ length: r.rating }).map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Please{' '}
+                      <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+                        log in
+                      </Link>{' '}
+                      to leave a review.
+                    </p>
+                  </div>
+                )}
+
+                {/* Reviews List */}
+                <div className="space-y-4">
+                  {reviews.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">No reviews yet. Be the first!</p>
+                  ) : (
+                    reviews.map(r => (
+                      <div key={r.id} className="p-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <img src={r.userAvatar} alt={r.userName} className="w-9 h-9 rounded-full" />
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-semibold text-gray-900 dark:text-white text-sm">{r.userName}</p>
+                                {r.verified && <span className="flex items-center gap-1 text-xs text-emerald-600"><CheckCircle className="w-3 h-3" />Verified</span>}
+                              </div>
+                              <div className="flex gap-0.5 mt-0.5">
+                                {Array.from({ length: r.rating }).map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
+                              </div>
                             </div>
                           </div>
+                          <span className="text-xs text-gray-400">{r.createdAt}</span>
                         </div>
-                        <span className="text-xs text-gray-400">{r.createdAt}</span>
+                        <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">{r.title}</p>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{r.comment}</p>
                       </div>
-                      <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">{r.title}</p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{r.comment}</p>
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
               </div>
             )}
 
@@ -285,5 +304,107 @@ export default function ProductDetails() {
         )}
       </div>
     </MainLayout>
+  );
+}
+
+function ReviewForm({ productId, user, onAddReview }: { productId: string; user: any; onAddReview: (r: any) => void }) {
+  const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [title, setTitle] = useState('');
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !comment.trim()) {
+      toast.error('Please fill in all fields.');
+      return;
+    }
+    setSubmitting(true);
+    
+    const newReview = {
+      id: `rev_new_${Date.now()}`,
+      productId,
+      userId: user.id,
+      userName: user.name,
+      userAvatar: user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face',
+      rating,
+      title: title.trim(),
+      comment: comment.trim(),
+      createdAt: new Date().toISOString().split('T')[0],
+      helpful: 0,
+      verified: true,
+    };
+    
+    onAddReview(newReview);
+    setTitle('');
+    setComment('');
+    setRating(5);
+    setSubmitting(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-5 bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700 rounded-xl space-y-4 shadow-sm">
+      <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Write a Review</h4>
+      
+      {/* Stars Selector */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Rating:</span>
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              onMouseEnter={() => setHoverRating(star)}
+              onMouseLeave={() => setHoverRating(0)}
+              className="p-0.5 text-gray-300 hover:scale-110 transition-transform"
+            >
+              <Star
+                className={`w-5 h-5 ${
+                  star <= (hoverRating || rating)
+                    ? 'fill-amber-400 text-amber-400'
+                    : 'text-gray-300 dark:text-gray-600'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Title */}
+      <div>
+        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Review Title</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Summarize your experience (e.g. Excellent code quality!)"
+          className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          required
+        />
+      </div>
+
+      {/* Comment */}
+      <div>
+        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Detailed Comment</label>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Tell us what you liked or disliked about this product..."
+          rows={3}
+          className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={submitting}
+        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
+      >
+        Submit Review
+      </button>
+    </form>
   );
 }

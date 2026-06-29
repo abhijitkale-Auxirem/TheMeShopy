@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Grid, List, SlidersHorizontal, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import MainLayout from '@/layouts/MainLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 import ProductCard from '@/components/marketplace/ProductCard';
 import ProductFilters from '@/components/marketplace/ProductFilters';
 import { ProductCardSkeleton } from '@/components/common/LoadingSkeleton';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import { useProductStore } from '@/store/productStore';
 
-export default function BrowseProducts() {
+interface BrowseProductsProps {
+  insideDashboard?: boolean;
+}
+
+export default function BrowseProducts({ insideDashboard = false }: BrowseProductsProps) {
   const [searchParams] = useSearchParams();
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [mobileFilters, setMobileFilters] = useState(false);
@@ -23,8 +28,9 @@ export default function BrowseProducts() {
     const search = searchParams.get('search');
     const cat = searchParams.get('cat');
     const sort = searchParams.get('sort');
-    if (search) setSearchQuery(search);
-    if (cat) setSelectedCategory(cat);
+    
+    setSearchQuery(search || '');
+    setSelectedCategory(cat || '');
     if (sort) setSortBy(sort);
     setLoading(true);
     const t = setTimeout(() => setLoading(false), 600);
@@ -33,9 +39,11 @@ export default function BrowseProducts() {
 
   const { products, totalPages, total } = getPaginatedProducts();
 
+  const Layout = insideDashboard ? DashboardLayout : MainLayout;
+
   return (
-    <MainLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <Layout>
+      <div className={`${insideDashboard ? 'max-w-6xl mx-auto' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'} py-8`}>
         <div className="mb-6">
           <Breadcrumb items={[{ label: 'Marketplace', href: '/marketplace' }, { label: selectedCategory ? selectedCategory.replace(/-/g, ' ') : 'Browse All' }]} />
           <div className="flex items-center justify-between mt-4">
@@ -117,6 +125,6 @@ export default function BrowseProducts() {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </Layout>
   );
 }

@@ -1,11 +1,13 @@
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { useAuthStore } from '@/store/authStore';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { User, Mail, Globe, MapPin, Save, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Profile() {
   const { user, updateUser } = useAuthStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   if (!user) return null;
 
   const [form, setForm] = useState({
@@ -15,6 +17,23 @@ export default function Profile() {
     website: user.website || '',
     location: user.location || '',
   });
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size must be less than 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        updateUser({ avatar: base64String });
+        toast.success('Avatar updated successfully!');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,8 +53,19 @@ export default function Profile() {
           {/* Avatar */}
           <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
             <div className="relative">
-              <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-full" />
-              <button className="absolute bottom-0 right-0 w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 transition-colors">
+              <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-full object-cover border border-gray-100 dark:border-gray-700 shadow-sm" />
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleAvatarChange} 
+                accept="image/*" 
+                className="hidden" 
+              />
+              <button 
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-md"
+              >
                 <Camera className="w-3.5 h-3.5" />
               </button>
             </div>

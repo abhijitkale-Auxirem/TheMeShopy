@@ -77,6 +77,7 @@ export interface Review {
   createdAt: string;
   helpful: number;
   verified: boolean;
+  status?: 'approved' | 'flagged';
 }
 
 export interface Order {

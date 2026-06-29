@@ -6,9 +6,11 @@ import { toast } from 'sonner';
 import type { UserRole } from '@/types';
 
 const roles: { value: UserRole; label: string; desc: string }[] = [
-  { value: 'buyer', label: 'Buyer', desc: 'Purchase and download digital products' },
-  { value: 'seller', label: 'Seller / Creator', desc: 'Sell your themes and templates' },
-  { value: 'agency', label: 'Agency', desc: 'Team licenses for multiple projects' },
+  { value: 'buyer', label: 'Buyer', desc: 'Purchase and download products' },
+  { value: 'seller', label: 'Creator', desc: 'Sell themes and templates' },
+  { value: 'agency', label: 'Agency', desc: 'Team licenses for client works' },
+  { value: 'affiliate', label: 'Partner', desc: 'Earn referral commission' },
+  { value: 'enterprise', label: 'Enterprise', desc: 'SLA contracts & compliance' },
 ];
 
 export default function Register() {
@@ -103,7 +105,7 @@ export default function Register() {
           {/* Role Selection */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">I want to...</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {roles.map(r => (
                 <button
                   key={r.value}

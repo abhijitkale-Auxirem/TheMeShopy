@@ -89,6 +89,12 @@ const tools: AIToolProps[] = [
     outputExample: 'Product description for "[INPUT]":\n\n🎯 Built for developers who value quality and speed.\n\n[INPUT] delivers a premium development experience with battle-tested components, comprehensive TypeScript types, and a pixel-perfect design system that adapts to your brand.',
     color: 'orange',
   },
+  {
+    icon: FileText, title: 'AI Documentation Generator', description: 'Generate installation and technical documentation',
+    placeholder: 'Enter library/module title and stack details (e.g. "React slider, TypeScript, Tailwind")',
+    outputExample: 'Documentation for "[INPUT]":\n\n## Installation\n```bash\nnpm install [INPUT]\n```\n\n## Usage\nImport it directly into your layout and supply components data. Supports fully responsive container queries and dark mode presets.',
+    color: 'rose',
+  }
 ];
 
 export default function AITools() {

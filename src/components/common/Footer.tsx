@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Package, Twitter, Github, Linkedin, Youtube, Mail } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const footerLinks = {
   Marketplace: [
@@ -35,14 +37,26 @@ const footerLinks = {
 };
 
 const socials = [
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Github, href: '#', label: 'GitHub' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Youtube, href: '#', label: 'YouTube' },
-  { icon: Mail, href: '#', label: 'Email' },
+  { icon: Twitter, href: 'https://twitter.com/themeshopy', label: 'Twitter' },
+  { icon: Github, href: 'https://github.com/themeshopy', label: 'GitHub' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/themeshopy', label: 'LinkedIn' },
+  { icon: Youtube, href: 'https://youtube.com/c/themeshopy', label: 'YouTube' },
+  { icon: Mail, href: 'mailto:hello@themeshopy.com', label: 'Email' },
 ];
 
 export default function Footer() {
+  const [email, setEmail] = useState('');
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    toast.success('Thank you for subscribing to our newsletter!');
+    setEmail('');
+  };
+
   return (
     <footer className="bg-gray-900 text-gray-400">
       {/* Main Footer */}
@@ -68,10 +82,12 @@ export default function Footer() {
                 <a
                   key={s.label}
                   href={s.href}
+                  target={s.href.startsWith('http') ? '_blank' : undefined}
+                  rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   aria-label={s.label}
-                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-indigo-600 flex items-center justify-center transition-colors"
+                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-indigo-600 flex items-center justify-center transition-colors group"
                 >
-                  <s.icon className="w-4 h-4 text-gray-400 hover:text-white transition-colors" />
+                  <s.icon className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
                 </a>
               ))}
             </div>
@@ -104,9 +120,12 @@ export default function Footer() {
               <h4 className="text-white font-semibold mb-1">Stay updated</h4>
               <p className="text-sm">Get the latest products and offers delivered to your inbox.</p>
             </div>
-            <form className="flex gap-2 w-full md:w-auto" onSubmit={e => e.preventDefault()}>
+            <form className="flex gap-2 w-full md:w-auto" onSubmit={handleSubscribe}>
               <input
                 type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 className="flex-1 md:w-72 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
               />

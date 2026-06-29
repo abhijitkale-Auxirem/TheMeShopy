@@ -22,6 +22,7 @@ import Cart from "./pages/Cart";
 // Dashboard Root
 import Dashboard from "./pages/dashboard/Dashboard";
 import Profile from "./pages/dashboard/Profile";
+import Notifications from "./pages/dashboard/Notifications";
 
 // Buyer
 import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
@@ -77,6 +78,13 @@ import FAQ from "./pages/FAQ";
 import Terms from "./pages/Terms";
 import Affiliate from "./pages/Affiliate";
 import AITools from "./pages/ai/AITools";
+import Privacy from "./pages/Privacy";
+import Refund from "./pages/Refund";
+import Creators from "./pages/Creators";
+import Agencies from "./pages/Agencies";
+import Enterprise from "./pages/Enterprise";
+import Developers from "./pages/Developers";
+import Blog from "./pages/Blog";
 
 // Protected Route
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -97,14 +105,14 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Terms />} />
-          <Route path="/refund-policy" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/refund-policy" element={<Refund />} />
           <Route path="/affiliate" element={<Affiliate />} />
-          <Route path="/creators" element={<Affiliate />} />
-          <Route path="/agencies" element={<About />} />
-          <Route path="/enterprise" element={<About />} />
-          <Route path="/developers" element={<About />} />
-          <Route path="/blog" element={<About />} />
+          <Route path="/creators" element={<Creators />} />
+          <Route path="/agencies" element={<Agencies />} />
+          <Route path="/enterprise" element={<Enterprise />} />
+          <Route path="/developers" element={<Developers />} />
+          <Route path="/blog" element={<Blog />} />
 
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
@@ -133,8 +141,10 @@ const App = () => (
           {/* Dashboard Root */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/dashboard/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
 
           {/* Buyer Routes */}
+          <Route path="/dashboard/marketplace" element={<ProtectedRoute><BrowseProducts insideDashboard={true} /></ProtectedRoute>} />
           <Route path="/dashboard/buyer" element={<ProtectedRoute><BuyerDashboard /></ProtectedRoute>} />
           <Route path="/dashboard/buyer/downloads" element={<ProtectedRoute><MyDownloads /></ProtectedRoute>} />
           <Route path="/dashboard/buyer/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
@@ -146,6 +156,7 @@ const App = () => (
           <Route path="/dashboard/seller" element={<ProtectedRoute><SellerDashboard /></ProtectedRoute>} />
           <Route path="/dashboard/seller/products" element={<ProtectedRoute><SellerProducts /></ProtectedRoute>} />
           <Route path="/dashboard/seller/upload" element={<ProtectedRoute><UploadProduct /></ProtectedRoute>} />
+          <Route path="/dashboard/seller/edit/:id" element={<ProtectedRoute><UploadProduct /></ProtectedRoute>} />
           <Route path="/dashboard/seller/earnings" element={<ProtectedRoute><SellerEarnings /></ProtectedRoute>} />
           <Route path="/dashboard/seller/customers" element={<ProtectedRoute><SellerCustomers /></ProtectedRoute>} />
           <Route path="/dashboard/seller/messages" element={<ProtectedRoute><SellerMessages /></ProtectedRoute>} />

@@ -1,14 +1,10 @@
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { Star, ThumbsUp, Edit2, Trash2, Package, Search } from 'lucide-react';
 import { useState } from 'react';
-import { mockReviews } from '@/database/mockDb';
-
-const myReviews = [
-  { id: 'rev_1', productName: 'Nexus - Modern SaaS Dashboard', productThumb: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=80&h=60&fit=crop', rating: 5, title: 'Absolutely stunning dashboard template!', comment: 'I have been using Nexus for 3 months now and I am blown away by the quality. The components are well-documented, clean code, and top-notch design. Highly recommend!', createdAt: '2024-05-15', helpful: 47 },
-  { id: 'rev_2', productName: 'Prism UI - React Component Library', productThumb: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=80&h=60&fit=crop', rating: 5, title: 'The most comprehensive UI kit available', comment: 'Prism UI has everything I need. 200+ components, excellent Figma integration, and superb code quality. Definitely worth every penny.', createdAt: '2024-05-01', helpful: 29 },
-  { id: 'rev_3', productName: 'IconFlow - 5000+ SVG Icons Pack', productThumb: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=80&h=60&fit=crop', rating: 5, title: 'The only icon pack you will ever need', comment: '5000+ icons and they are all perfectly consistent. The Figma plugin is a game changer. I use IconFlow on every project now.', createdAt: '2024-06-01', helpful: 56 },
-  { id: 'rev_4', productName: 'Aurora - Landing Page Kit', productThumb: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=80&h=60&fit=crop', rating: 4, title: 'Great landing page kit', comment: 'Aurora has beautiful animations and the sections are well-designed. Would love a few more section options but overall very happy with the purchase.', createdAt: '2024-04-10', helpful: 18 },
-];
+import { useAuthStore } from '@/store/authStore';
+import { useReviewStore } from '@/store/reviewStore';
+import { useProductStore } from '@/store/productStore';
+import { toast } from 'sonner';
 
 function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' }) {
   return (
@@ -21,15 +17,37 @@ function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md
 }
 
 export default function BuyerReviews() {
+  const { user } = useAuthStore();
+  const { reviews: allReviews, updateReview, deleteReview } = useReviewStore();
+  const { products } = useProductStore();
+
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<string | null>(null);
+  const [editedComment, setEditedComment] = useState('');
+
+  if (!user) return null;
+
+  // Filter reviews written by this user
+  const userReviews = allReviews.filter(r => r.userId === user.id);
+  
+  // Enrich reviews with product info
+  const myReviews = userReviews.map(r => {
+    const product = products.find(p => p.id === r.productId);
+    return {
+      ...r,
+      productName: product ? product.title : 'Unknown Product',
+      productThumb: product ? product.thumbnail : 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=80&h=60&fit=crop',
+    };
+  });
 
   const filtered = myReviews.filter(r =>
     r.productName.toLowerCase().includes(search.toLowerCase()) ||
     r.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const avgRating = (myReviews.reduce((s, r) => s + r.rating, 0) / myReviews.length).toFixed(1);
+  const avgRating = myReviews.length > 0 
+    ? (myReviews.reduce((s, r) => s + r.rating, 0) / myReviews.length).toFixed(1)
+    : '0.0';
 
   return (
     <DashboardLayout>
@@ -84,12 +102,21 @@ export default function BuyerReviews() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setEditing(editing === review.id ? null : review.id)}
+                        onClick={() => {
+                          setEditing(editing === review.id ? null : review.id);
+                          setEditedComment(review.comment);
+                        }}
                         className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                      <button 
+                        onClick={() => {
+                          deleteReview(review.id);
+                          toast.success('Review deleted successfully');
+                        }}
+                        className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -98,12 +125,22 @@ export default function BuyerReviews() {
                   {editing === review.id ? (
                     <div className="mt-3">
                       <textarea
-                        defaultValue={review.comment}
+                        value={editedComment}
+                        onChange={e => setEditedComment(e.target.value)}
                         rows={3}
                         className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-white resize-none"
                       />
                       <div className="flex gap-2 mt-2">
-                        <button className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700" onClick={() => setEditing(null)}>Save</button>
+                        <button 
+                          className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700" 
+                          onClick={() => {
+                            updateReview(review.id, { comment: editedComment });
+                            setEditing(null);
+                            toast.success('Review updated successfully');
+                          }}
+                        >
+                          Save
+                        </button>
                         <button className="px-3 py-1.5 text-gray-500 text-xs font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => setEditing(null)}>Cancel</button>
                       </div>
                     </div>

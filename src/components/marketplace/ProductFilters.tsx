@@ -9,10 +9,17 @@ interface FiltersProps {
 }
 
 export default function ProductFilters({ onClose, mobile }: FiltersProps) {
-  const { selectedCategory, setSelectedCategory, sortBy, setSortBy, priceRange, setPriceRange } = useProductStore();
+  const { 
+    selectedCategory, setSelectedCategory, 
+    sortBy, setSortBy, 
+    priceRange, setPriceRange,
+    selectedTechStack, toggleTechStack, setSelectedTechStack,
+    products
+  } = useProductStore();
+
   const [catOpen, setCatOpen] = useState(true);
   const [priceOpen, setPriceOpen] = useState(true);
-  const [techOpen, setTechOpen] = useState(false);
+  const [techOpen, setTechOpen] = useState(true); // Open by default for easier desktop filter visibility
 
   const techStackOptions = ['React', 'Vue', 'Angular', 'Next.js', 'WordPress', 'Flutter', 'Figma', 'TypeScript'];
 
@@ -20,10 +27,15 @@ export default function ProductFilters({ onClose, mobile }: FiltersProps) {
     setSelectedCategory('');
     setSortBy('featured');
     setPriceRange([0, 500]);
+    setSelectedTechStack([]);
+  };
+
+  const getDynamicProductCount = (categorySlug: string) => {
+    return products.filter(p => p.categorySlug === categorySlug && p.status === 'active').length;
   };
 
   return (
-    <div className={`${mobile ? '' : 'sticky top-20'} bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden`}>
+    <div className={`${mobile ? '' : 'sticky top-20'} bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-2">
@@ -68,31 +80,37 @@ export default function ProductFilters({ onClose, mobile }: FiltersProps) {
         </button>
         {catOpen && (
           <div className="space-y-1 max-h-60 overflow-y-auto">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="category"
-                checked={selectedCategory === ''}
-                onChange={() => setSelectedCategory('')}
-                className="text-indigo-600"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">All Categories</span>
+            <label className="flex items-center justify-between cursor-pointer group">
+              <div className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="category"
+                  checked={selectedCategory === ''}
+                  onChange={() => setSelectedCategory('')}
+                  className="text-indigo-600"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 transition-colors">All Categories</span>
+              </div>
+              <span className="text-xs text-gray-400">{products.filter(p => p.status === 'active').length}</span>
             </label>
-            {mockCategories.map(cat => (
-              <label key={cat.id} className="flex items-center justify-between cursor-pointer group">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={selectedCategory === cat.slug}
-                    onChange={() => setSelectedCategory(cat.slug)}
-                    className="text-indigo-600"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 transition-colors">{cat.name}</span>
-                </div>
-                <span className="text-xs text-gray-400">{cat.productCount}</span>
-              </label>
-            ))}
+            {mockCategories.map(cat => {
+              const count = getDynamicProductCount(cat.slug);
+              return (
+                <label key={cat.id} className="flex items-center justify-between cursor-pointer group">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={selectedCategory === cat.slug}
+                      onChange={() => setSelectedCategory(cat.slug)}
+                      className="text-indigo-600"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 transition-colors">{cat.name}</span>
+                  </div>
+                  <span className="text-xs text-gray-400">{count}</span>
+                </label>
+              );
+            })}
           </div>
         )}
       </div>
@@ -146,19 +164,27 @@ export default function ProductFilters({ onClose, mobile }: FiltersProps) {
           onClick={() => setTechOpen(!techOpen)}
           className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2"
         >
-          Tech Stack
+          Tech Stack {selectedTechStack.length > 0 && `(${selectedTechStack.length})`}
           {techOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {techOpen && (
           <div className="flex flex-wrap gap-1.5">
-            {techStackOptions.map(tech => (
-              <button
-                key={tech}
-                className="px-2.5 py-1 text-xs rounded-full border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-400 hover:text-indigo-600 transition-colors"
-              >
-                {tech}
-              </button>
-            ))}
+            {techStackOptions.map(tech => {
+              const isTechActive = selectedTechStack.includes(tech);
+              return (
+                <button
+                  key={tech}
+                  onClick={() => toggleTechStack(tech)}
+                  className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                    isTechActive 
+                      ? 'bg-indigo-600 border-indigo-600 text-white dark:bg-indigo-500 dark:border-indigo-500' 
+                      : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-400 hover:text-indigo-600'
+                  }`}
+                >
+                  {tech}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

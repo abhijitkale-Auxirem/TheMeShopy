@@ -15,6 +15,7 @@ import type { UserRole } from '@/types';
 const getSidebarLinks = (role: UserRole) => {
   const common = [
     { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
+    { icon: ShoppingBag, label: 'Marketplace', href: '/dashboard/marketplace' },
   ];
 
   const byRole: Record<UserRole, { icon: React.ComponentType<{ className?: string }>, label: string, href: string }[]> = {
@@ -185,7 +186,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <Link to="/marketplace" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative text-gray-600 dark:text-gray-400">
+            <Link to="/dashboard/notifications" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative text-gray-600 dark:text-gray-400">
               <Bell className="w-4 h-4" />
               {unread > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full" />}
             </Link>

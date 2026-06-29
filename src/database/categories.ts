@@ -109,4 +109,22 @@ export const mockCategories: Category[] = [
     productCount: 134,
     color: 'yellow',
   },
+  {
+    id: 'cat_13',
+    name: 'HTML Templates',
+    slug: 'html-templates',
+    description: 'Static HTML5 and CSS3 website templates',
+    icon: 'FileCode2',
+    productCount: 152,
+    color: 'blue',
+  },
+  {
+    id: 'cat_14',
+    name: 'Mobile App Templates',
+    slug: 'mobile-app-templates',
+    description: 'React Native, Swift, and Kotlin app templates',
+    icon: 'SmartphoneIcon',
+    productCount: 98,
+    color: 'purple',
+  },
 ];

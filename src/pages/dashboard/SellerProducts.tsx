@@ -60,7 +60,7 @@ export default function SellerProducts() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <Link to={`/marketplace/product/${p.slug}`} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"><Eye className="w-4 h-4" /></Link>
-                        <button onClick={() => toast.info('Edit feature coming soon!')} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"><Edit className="w-4 h-4" /></button>
+                        <Link to={`/dashboard/seller/edit/${p.id}`} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"><Edit className="w-4 h-4" /></Link>
                         <button onClick={() => { deleteProduct(p.id); toast.success('Product deleted'); }} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </td>

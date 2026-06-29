@@ -11,11 +11,14 @@ interface ProductState {
   priceRange: [number, number];
   currentPage: number;
   itemsPerPage: number;
+  selectedTechStack: string[];
   setSearchQuery: (q: string) => void;
   setSelectedCategory: (c: string) => void;
   setSortBy: (s: string) => void;
   setPriceRange: (r: [number, number]) => void;
   setCurrentPage: (p: number) => void;
+  toggleTechStack: (t: string) => void;
+  setSelectedTechStack: (ts: string[]) => void;
   getFilteredProducts: () => Product[];
   getPaginatedProducts: () => { products: Product[]; totalPages: number; total: number };
   addProduct: (product: Product) => void;
@@ -33,15 +36,22 @@ export const useProductStore = create<ProductState>()(
       priceRange: [0, 500],
       currentPage: 1,
       itemsPerPage: 12,
+      selectedTechStack: [],
 
       setSearchQuery: (q) => set({ searchQuery: q, currentPage: 1 }),
       setSelectedCategory: (c) => set({ selectedCategory: c, currentPage: 1 }),
       setSortBy: (s) => set({ sortBy: s }),
       setPriceRange: (r) => set({ priceRange: r }),
       setCurrentPage: (p) => set({ currentPage: p }),
+      toggleTechStack: (t) => {
+        const current = get().selectedTechStack;
+        const next = current.includes(t) ? current.filter(item => item !== t) : [...current, t];
+        set({ selectedTechStack: next, currentPage: 1 });
+      },
+      setSelectedTechStack: (ts) => set({ selectedTechStack: ts, currentPage: 1 }),
 
       getFilteredProducts: () => {
-        const { products, searchQuery, selectedCategory, sortBy, priceRange } = get();
+        const { products, searchQuery, selectedCategory, sortBy, priceRange, selectedTechStack } = get();
         let filtered = products.filter(p => p.status === 'active');
 
         if (searchQuery) {
@@ -59,6 +69,14 @@ export const useProductStore = create<ProductState>()(
         }
 
         filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+
+        if (selectedTechStack && selectedTechStack.length > 0) {
+          filtered = filtered.filter(p =>
+            selectedTechStack.some(t =>
+              p.techStack.some(pt => pt.toLowerCase() === t.toLowerCase())
+            )
+          );
+        }
 
         switch (sortBy) {
           case 'newest':
