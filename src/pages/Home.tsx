@@ -31,19 +31,19 @@ const features = [
 const testimonials = [
   {
     name: 'Jordan Lee', role: 'Product Manager, TechCorp',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test1',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
     rating: 5,
     text: 'TheMeShopy transformed how we build products. The quality of templates is unmatched and saves us weeks of development.',
   },
   {
     name: 'Ava Thompson', role: 'Founder, StartupLab',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test2',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     rating: 5,
     text: 'I launched my SaaS in 2 weeks using templates from TheMeShopy. The LaunchKit boilerplate alone saved me $10,000 in development.',
   },
   {
     name: 'Carlos Rivera', role: 'Creative Director, DesignStudio',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test3',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
     rating: 5,
     text: 'As a seller, TheMeShopy has been life-changing. I earn a full-time income selling UI kits and templates.',
   },

@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
           password: data.password,
           name: data.name || 'New User',
           role: data.role || 'buyer',
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`,
+          avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face`,
           joinedAt: new Date().toISOString().split('T')[0],
           isVerified: false,
           earnings: 0,

@@ -3,10 +3,10 @@ import { mockUsers, mockProducts } from '@/database/mockDb';
 import { Award, Globe, Users, Package, TrendingUp, Heart } from 'lucide-react';
 
 const team = [
-  { name: 'James Wilson', role: 'Founder & CEO', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ceo', bio: 'Serial entrepreneur with 15+ years in digital products and marketplaces.' },
-  { name: 'Sarah Chen', role: 'Chief Design Officer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=cdo', bio: 'Award-winning designer previously at Figma and Adobe.' },
-  { name: 'Marcus Johnson', role: 'CTO', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=cto', bio: 'Full-stack engineer with expertise in marketplaces and developer tools.' },
-  { name: 'Priya Sharma', role: 'Head of Creator Success', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=creator', bio: 'Passionate about empowering creators to build sustainable online businesses.' },
+  { name: 'James Wilson', role: 'Founder & CEO', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', bio: 'Serial entrepreneur with 15+ years in digital products and marketplaces.' },
+  { name: 'Sarah Chen', role: 'Chief Design Officer', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face', bio: 'Award-winning designer previously at Figma and Adobe.' },
+  { name: 'Marcus Johnson', role: 'CTO', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face', bio: 'Full-stack engineer with expertise in marketplaces and developer tools.' },
+  { name: 'Priya Sharma', role: 'Head of Creator Success', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face', bio: 'Passionate about empowering creators to build sustainable online businesses.' },
 ];
 
 const values = [
