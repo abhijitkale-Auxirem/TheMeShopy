@@ -14,7 +14,6 @@ const footerLinks = {
   ],
   Creators: [
     { label: 'Become a Seller', href: '/register?role=seller' },
-    { label: 'Seller Dashboard', href: '/dashboard/seller' },
     { label: 'Upload Product', href: '/dashboard/seller/upload' },
     { label: 'Affiliate Program', href: '/affiliate' },
     { label: 'Creator Resources', href: '/creators' },

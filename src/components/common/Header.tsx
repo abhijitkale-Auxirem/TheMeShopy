@@ -127,7 +127,7 @@ export default function Header() {
             {isAuthenticated ? (
               <>
                 {/* Wishlist */}
-                <Link to="/marketplace" className="relative p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <Link to="/dashboard/buyer/wishlist" className="relative p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                   <Heart className="w-5 h-5" />
                   {wishCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-xs rounded-full flex items-center justify-center">

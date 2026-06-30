@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, ShoppingCart, Star, Eye, Download } from 'lucide-react';
 import type { Product } from '@/types';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useCartStore } from '@/store/cartStore';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 
 interface ProductCardProps {
@@ -13,6 +14,9 @@ interface ProductCardProps {
 export default function ProductCard({ product, view = 'grid' }: ProductCardProps) {
   const { toggleItem, hasItem } = useWishlistStore();
   const { addItem, hasItem: inCart } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const isWishlisted = hasItem(product.id);
   const isInCart = inCart(product.id);
@@ -20,6 +24,11 @@ export default function ProductCard({ product, view = 'grid' }: ProductCardProps
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      toast.info('Please log in to save items to your wishlist');
+      return;
+    }
     toggleItem(product);
     toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
   };
@@ -27,6 +36,11 @@ export default function ProductCard({ product, view = 'grid' }: ProductCardProps
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      toast.info('Please log in to add items to your cart');
+      return;
+    }
     if (!isInCart) {
       addItem(product);
       toast.success('Added to cart!');
@@ -94,9 +108,14 @@ export default function ProductCard({ product, view = 'grid' }: ProductCardProps
             >
               <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
             </button>
-            <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-900">
+            <Link
+              to={`/marketplace/product/${product.slug}`}
+              onClick={e => e.stopPropagation()}
+              title="View Product"
+              className="w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-900 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+            >
               <Eye className="w-4 h-4" />
-            </div>
+            </Link>
             <button
               onClick={handleAddToCart}
               className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${

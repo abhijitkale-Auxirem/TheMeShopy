@@ -15,8 +15,11 @@ import type { UserRole } from '@/types';
 const getSidebarLinks = (role: UserRole) => {
   const common = [
     { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
-    { icon: ShoppingBag, label: 'Marketplace', href: '/dashboard/marketplace' },
   ];
+
+  if (role !== 'buyer') {
+    common.push({ icon: ShoppingBag, label: 'Marketplace', href: '/dashboard/marketplace' });
+  }
 
   const byRole: Record<UserRole, { icon: React.ComponentType<{ className?: string }>, label: string, href: string }[]> = {
     buyer: [

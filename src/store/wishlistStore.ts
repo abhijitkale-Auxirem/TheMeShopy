@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { WishlistItem, Product } from '@/types';
-import { mockProducts } from '@/database/mockDb';
 
 interface WishlistState {
   items: WishlistItem[];
@@ -12,24 +11,10 @@ interface WishlistState {
   getCount: () => number;
 }
 
-// Default pre-populated wishlist items using the first two mock products
-const initialItems: WishlistItem[] = mockProducts && mockProducts.length >= 2 ? [
-  {
-    productId: mockProducts[0].id,
-    product: mockProducts[0],
-    addedAt: new Date().toISOString(),
-  },
-  {
-    productId: mockProducts[1].id,
-    product: mockProducts[1],
-    addedAt: new Date().toISOString(),
-  }
-] : [];
-
 export const useWishlistStore = create<WishlistState>()(
   persist(
     (set, get) => ({
-      items: initialItems,
+      items: [],
 
       addItem: (product: Product) => {
         if (get().hasItem(product.id)) return;
@@ -58,6 +43,6 @@ export const useWishlistStore = create<WishlistState>()(
 
       getCount: () => get().items.length,
     }),
-    { name: 'themeshopy-wishlist' }
+    { name: 'themeshopy-wishlist', version: 2 }
   )
 );

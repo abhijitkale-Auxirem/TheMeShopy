@@ -128,6 +128,19 @@ export const useProductStore = create<ProductState>()(
         set({ products: get().products.filter(p => p.id !== id) });
       },
     }),
-    { name: 'themeshopy-products' }
+    {
+      name: 'themeshopy-products',
+      // Never cache the products array — always use fresh mockProducts on load.
+      // Only persist UI/filter state so search + filters survive page refresh.
+      partialize: (state) => ({
+        searchQuery: state.searchQuery,
+        selectedCategory: state.selectedCategory,
+        sortBy: state.sortBy,
+        priceRange: state.priceRange,
+        currentPage: state.currentPage,
+        selectedTechStack: state.selectedTechStack,
+      }),
+      version: 1,
+    }
   )
 );

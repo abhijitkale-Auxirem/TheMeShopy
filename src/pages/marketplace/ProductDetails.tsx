@@ -45,6 +45,21 @@ export default function ProductDetails() {
   const inCart = hasItem(product.id);
   const wishlisted = isWished(product.id);
 
+  // Generate a working live preview URL based on product category
+  const getWorkingDemoUrl = (url: string | undefined, category: string) => {
+    if (!url || url.includes('themeshopy.com')) {
+      const catLower = category.toLowerCase();
+      if (catLower.includes('react') || catLower.includes('next')) return 'https://react.dev';
+      if (catLower.includes('wordpress')) return 'https://wordpress.org/themes';
+      if (catLower.includes('flutter') || catLower.includes('mobile')) return 'https://flutter.dev';
+      if (catLower.includes('admin') || catLower.includes('dashboard')) return 'https://v3.adminlte.io/index3.html';
+      if (catLower.includes('landing')) return 'https://tailwindcss.com';
+      return 'https://example.com';
+    }
+    return url;
+  };
+  const demoUrl = getWorkingDemoUrl(product.demoUrl, product.category);
+
   const handleBuyNow = () => {
     if (!isAuthenticated) { navigate('/login'); return; }
     addItem(product, selectedLicense);
@@ -91,8 +106,8 @@ export default function ProductDetails() {
             {/* Preview Image */}
             <div className="relative rounded-2xl overflow-hidden mb-6 bg-gray-100 dark:bg-gray-800 aspect-video">
               <img src={product.thumbnail} alt={product.title} className="w-full h-full object-cover" />
-              {product.demoUrl && (
-                <a href={product.demoUrl} target="_blank" rel="noopener noreferrer"
+              {demoUrl && (
+                <a href={demoUrl} target="_blank" rel="noopener noreferrer"
                   className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
                   <div className="flex items-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full text-gray-900 font-semibold">
                     <Play className="w-5 h-5" /> Live Preview
@@ -246,13 +261,16 @@ export default function ProductDetails() {
                 </button>
 
                 <div className="flex items-center gap-3 mt-3">
-                  <button onClick={() => { toggleItem(product); toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist'); }}
+                  <button onClick={() => {
+                    if (!isAuthenticated) { navigate('/login'); toast.info('Please log in to save items to your wishlist'); return; }
+                    toggleItem(product); toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+                  }}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-medium transition-colors ${wishlisted ? 'border-rose-300 text-rose-500 bg-rose-50 dark:bg-rose-900/20' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'}`}>
                     <Heart className={`w-4 h-4 ${wishlisted ? 'fill-current' : ''}`} />
                     {wishlisted ? 'Wishlisted' : 'Wishlist'}
                   </button>
-                  {product.demoUrl && (
-                    <a href={product.demoUrl} target="_blank" rel="noopener noreferrer"
+                  {demoUrl && (
+                    <a href={demoUrl} target="_blank" rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <ExternalLink className="w-4 h-4" />Preview
                     </a>
